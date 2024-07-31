@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import config
-import os
 
 # Function to generate a temporary email using 1secmail API
 def generate_temp_email():
@@ -59,7 +58,7 @@ def confirm_email(session, confirmation_link):
 
 # Function to log account details
 def log_account_details(email, password):
-    with open("login.txt", "a") as file:
+    with open("account_details.txt", "a") as file:
         file.write(f"Email: {email}, Password: {password}\n")
     print("Account details logged successfully!")
 

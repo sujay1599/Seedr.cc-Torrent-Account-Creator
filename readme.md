@@ -1,85 +1,124 @@
-# Seedr.cc Account Creator
+# Seedr.cc Torrent Account Creator, Scraper, and Magnet Link Verifier
+
+This repository contains scripts to automate the creation of a Seedr.cc account, scrape torrent links from popular sources, and verify magnet links by placing them in Seedr.cc for downloading.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+- [How It Works](#how-it-works)
+  - [main.py](#mainpy)
+  - [verify.py](#verifypy)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Overview
 
-This Python script automates the process of creating an account on Seedr.cc using a temporary email from 1secmail.com. The script handles the entire process, including email generation, account registration, CAPTCHA handling, email verification, and final account activation.
+The project is divided into two main components:
 
-## Features
-
-- **Temporary Email Generation**: Automatically generates a temporary email using 1secmail.com.
-- **Automated Registration**: Uses the generated email to register a new account on Seedr.cc.
-- **CAPTCHA Handling**: Pauses the script to allow manual CAPTCHA solving during registration.
-- **Email Verification**: Automatically checks the inbox for the Seedr.cc verification email, opens it, and clicks the verification link.
-- **Account Activation**: After clicking the verification link, the script handles the final account activation on the Seedr.cc website.
-- **Logging**: Logs the generated username (email), password, and the creation timestamp to a CSV file for future reference.
+1. **`main.py`**: Automates the creation of a Seedr.cc account, logs in, scrapes torrent links from 1337x and The Pirate Bay, and saves the results to a CSV file.
+2. **`verify.py`**: Verifies available storage on Seedr.cc and places magnet links from the CSV file into Seedr.cc for downloading.
 
 ## Prerequisites
 
-- **Python 3.x**: Ensure Python is installed on your machine.
-- **Selenium**: The script uses the Selenium library to automate browser interactions.
-- **Chrome WebDriver**: Required to control the Chrome browser.
+- **Python 3.6+**
+- **Google Chrome** (latest version)
+- **Chromedriver** compatible with your version of Chrome
 
-### Python Libraries
+### Required Python Packages
 
-You need to install the following Python libraries:
+Install the required Python packages:
 
 ```bash
 pip install -r requirements.txt
 ```
 
+Contents of `requirements.txt`:
+
+```
+selenium
+beautifulsoup4
+requests
+pyperclip
+```
+
 ## Setup
 
-1. **Clone the Repository**: Clone this repository to your local machine.
+1. **Clone the Repository**
 
    ```bash
    git clone https://github.com/sujay1599/Seedr.cc-Torrent-Account-Creator.git
    cd Seedr.cc-Torrent-Account-Creator
    ```
 
-2. **Download ChromeDriver**: Ensure you have the correct version of ChromeDriver for your Chrome browser. Place the `chromedriver.exe` file in the same directory as your script or add it to your system PATH.
+2. **Configure Chromedriver**
 
-3. **Install Dependencies**: Install the required Python libraries as mentioned above.
+   Make sure the path to `chromedriver.exe` is correctly set in the `chrome_driver_path` variable in both `main.py` and `verify.py`.
 
-4. **Run the Script**: Execute the script using Python.
+3. **Run `main.py`**
+
+   This script handles creating a Seedr.cc account, logging in, and scraping torrent links.
 
    ```bash
    python main.py
    ```
 
-## Usage
+   After the script completes:
+   - The browser will automatically close.
+   - The scraped torrent links with the required number of seeders will be saved in `sorted_torrents.csv`.
 
-1. **Temporary Email Generation**: The script starts by generating a temporary email using 1secmail.com.
-2. **Account Registration**: It then opens the Seedr.cc registration page in a new browser tab and automatically fills out the registration form using the generated email and a predefined password.
-3. **CAPTCHA Handling**: After pressing the "Continue" button, the script pauses and waits for you to complete the CAPTCHA.
-4. **Email Verification**: Once you solve the CAPTCHA and press "Enter", the script resumes. It switches back to the 1secmail inbox, awaits the verification email from Seedr.cc, and automatically opens it.
-5. **Final Activation**: The script clicks the "Start" button in the email, switches to the new tab, and clicks the "Activate Account" button to complete the registration.
+4. **Run `verify.py`**
 
-### Logging
+   After `main.py` completes, you can manually run `verify.py` to:
 
-- The generated username (email), password, and timestamp are stored in a CSV file named `credentials.csv` in the same directory as the script.
+   - Open a new browser session.
+   - Log in to Seedr.cc using the credentials saved during the `main.py` process.
+   - Place magnet links from `sorted_torrents.csv` into Seedr.cc for downloading.
+   - Manage storage on Seedr.cc if needed.
 
-### File Structure
+   ```bash
+   python verify.py
+   ```
 
-```plaintext
-.
-├── credentials.csv         # Stores generated emails, passwords, and timestamps.
-├── main.py                 # Main script file.
-├── requirements.txt        # Python dependencies.
-└── README.md               # This documentation file.
-```
+## How It Works
 
-## Notes
+### `main.py`
 
-- **Manual CAPTCHA Solving**: The CAPTCHA needs to be solved manually. The script will wait for user input before continuing.
-- **Browser Support**: The script currently supports the Chrome browser via Selenium.
-- **Email Verification**: Ensure that the browser window is not refreshed or closed after receiving the verification email, as this could cause the email address to change, leading to a loss of the verification link.
+1. **Account Creation and Login**
+   - Generates a temporary email using `1secmail`.
+   - Creates a Seedr.cc account and logs in.
+   - Navigates to the Seedr.cc dashboard.
+
+2. **Torrent Scraping**
+   - Scrapes torrent links from 1337x and The Pirate Bay based on user-defined search terms and categories.
+   - Saves torrents with more than the specified number of seeders to `sorted_torrents.csv`.
+
+3. **Automated Browsing**
+   - Automates browsing and interaction with Seedr.cc.
+
+### `verify.py`
+
+1. **Storage Management**
+   - Verifies available storage in Seedr.cc.
+   - Deletes files if storage exceeds the defined limit.
+
+2. **Magnet Link Verification**
+   - Reads `sorted_torrents.csv`.
+   - Randomly selects and places magnet links into Seedr.cc for download.
+   - Verifies if more magnet links can be placed based on available storage.
 
 ## Troubleshooting
 
-- **ChromeDriver Issues**: Ensure that the ChromeDriver version matches your installed Chrome browser version.
-- **Element Not Found Errors**: If the script fails to locate elements, ensure the website structure hasn't changed. Update the XPath selectors in the script if necessary.
-- **CAPTCHA Handling**: Since the CAPTCHA is solved manually, ensure you complete it promptly to avoid session timeouts.
+- **Module Not Found Errors**: Ensure all required Python packages are installed using `pip install -r requirements.txt`.
+- **Chromedriver Issues**: Verify that the `chromedriver.exe` path matches your local setup and is compatible with your version of Chrome.
+- **Deprecation Warnings**: Update your code to handle any deprecated methods if you encounter warnings.
+
+## Contributing
+
+Contributions, bug reports, and feature requests are welcome! Please open an issue or submit a pull request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

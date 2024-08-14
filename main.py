@@ -7,6 +7,7 @@ import time
 import pyperclip
 import csv
 from datetime import datetime
+import subprocess
 
 # Setup Chrome options to suppress logging and run in incognito mode
 chrome_options = webdriver.ChromeOptions()
@@ -109,6 +110,7 @@ except Exception as e:
 
 # Step 15: Switch to the new tab opened by the "Start" button
 driver.switch_to.window(driver.window_handles[-1])
+time.sleep(5) 
 
 # Step 16: Wait for the "Activate Account" button to be clickable and then click it
 try:
@@ -119,6 +121,31 @@ try:
     print("Activate Account button clicked.")
 except Exception as e:
     print("Error: Unable to find the Activate Account button. ", e)
+
+time.sleep(15) 
+
+# Close the black box using the provided XPath
+try:
+    close_black_box_button = WebDriverWait(driver, 20).until(
+        EC.element_to_be_clickable((By.XPATH, "/html/body/div[45]/div/a[2]"))
+    )
+    close_black_box_button.click()
+    print("Black box closed successfully.")
+except Exception as e:
+    print("Error: Unable to close the black box. ", e)
+time.sleep(15) 
+
+# Step 18: Run the scraper script
+print("Running the scraper script...")
+try:
+    # subprocess.run(["python", "scraper.py"], check=True)
+    subprocess.run([r"C:\Users\sujay\Desktop\Python\Seedr.cc-Torrent-Account-Creator-main SFW\Seedr.cc-Torrent-Account-Creator Scrapper and Downloader\.venv\Scripts\python.exe", "scraper.py"], check=True)
+
+    print("Scraper script completed.")
+except subprocess.CalledProcessError as e:
+    print(f"Error running scraper script: {e}")
+    driver.quit()
+    exit()
 
 # The browser will remain open after the script completes
 print("Script completed. The browser will remain open.")
